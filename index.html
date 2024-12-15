@@ -1,29 +1,110 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Intro to AJAX Practice Tasks</title>
-    <script src="src/index.js" charset="utf-8"></script>
-  </head>
-  <body>
-    <h1>Dog CEO</h1>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dog CEO</title>
+  <style>
+    img {
+      width: 200px;
+      margin: 10px;
+    }
+    li {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dog Images</h1>
+  <div id="dog-images"></div>
 
-    <div id="dog-image-container">
-      <!-- images here -->
-    </div>
+  <h1>Dog Breeds</h1>
+  <ul id="dog-breeds"></ul>
 
-    <hr>
-    <label for="select-breed">Filter Breeds That Start with:</label>
-    <select id="breed-dropdown" name="select-breed">
-      <option value="a">a</option>
-      <option value="b">b</option>
-      <option value="c">c</option>
-      <option value="d">d</option>
-    </select>
+  <h2>Filter Breeds</h2>
+  <select id="breed-filter">
+    <option value="">Select a letter</option>
+    <option value="a">A</option>
+    <option value="b">B</option>
+    <option value="c">C</option>
+    <option value="d">D</option>
+  </select>
 
-    <ul id="dog-breeds">
+  <script>
+    // Challenge 1: Fetch dog images and render them
+    const imgUrl = "https://dog.ceo/api/breeds/image/random/4";
+    const dogImagesContainer = document.getElementById('dog-images');
 
-    </ul>
+    // Function to fetch dog images
+    function fetchDogImages() {
+      fetch(imgUrl)
+        .then(response => response.json())
+        .then(data => {
+          data.message.forEach(imageUrl => {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = 'A cute dog';
+            dogImagesContainer.appendChild(img);
+          });
+        })
+        .catch(error => console.error('Error fetching dog images:', error));
+    }
 
-  </body>
+    // Challenge 2: Fetch dog breeds and render them
+    const breedUrl = "https://dog.ceo/api/breeds/list/all";
+    const dogBreedsContainer = document.getElementById('dog-breeds');
+
+    // Function to fetch and display dog breeds
+    function fetchDogBreeds() {
+      fetch(breedUrl)
+        .then(response => response.json())
+        .then(data => {
+          const breeds = data.message;
+          Object.keys(breeds).forEach(breed => {
+            const li = document.createElement('li');
+            li.textContent = breed;
+            dogBreedsContainer.appendChild(li);
+          });
+
+          // Challenge 3: Change font color on click
+          const breedItems = dogBreedsContainer.getElementsByTagName('li');
+          for (let breedItem of breedItems) {
+            breedItem.addEventListener('click', () => {
+              breedItem.style.color = 'red'; // Change color to red when clicked
+            });
+          }
+        })
+        .catch(error => console.error('Error fetching dog breeds:', error));
+    }
+
+    // Challenge 4: Filter breeds by letter
+    const breedFilter = document.getElementById('breed-filter');
+
+    // Function to filter breeds by starting letter
+    function filterBreedsByLetter() {
+      const selectedLetter = breedFilter.value;
+      const breedItems = dogBreedsContainer.getElementsByTagName('li');
+
+      Array.from(breedItems).forEach(breedItem => {
+        const breedName = breedItem.textContent;
+        if (selectedLetter && breedName.startsWith(selectedLetter)) {
+          breedItem.style.display = 'block'; // Show the breed
+        } else {
+          breedItem.style.display = 'none'; // Hide the breed
+        }
+      });
+    }
+
+    // Event listener for breed filter dropdown
+    breedFilter.addEventListener('change', filterBreedsByLetter);
+
+    // Run all functions when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchDogImages();
+      fetchDogBreeds();
+    });
+  </script>
+</body>
 </html>
+
+
